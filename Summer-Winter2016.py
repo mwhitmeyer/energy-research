@@ -6,7 +6,7 @@ Created on Sun Jul 16 15:10:04 2017
 """
 
 import pandas as pd
-import numpy as nm
+import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 
@@ -49,7 +49,7 @@ winterhours.sort()
     plt.figure(figsize=(12,8))  
     x = totalhourlysummer.loc[hour]
     (a,b,loc,scale)=stats.beta.fit(x['use'], loc=0, fscale = x['use'].max())
-    evenspaced = nm.linspace(0, x['use'].max(), 100)
+    evenspaced = np.linspace(0, x['use'].max(), 100)
     pdf = stats.beta.pdf(evenspaced, a, b, loc = loc, scale = scale)  
     plt.plot(evenspaced, pdf)
     plt.hist(x['use'], normed = True)
@@ -62,7 +62,7 @@ winterhours.sort()
     plt.figure(figsize=(12,8)) 
     x = totalhourlysummer.loc[hour]
     (a,b,loc,scale)=stats.beta.fit(x['gen'], loc=0, fscale = x['gen'].max())
-    evenspaced = nm.linspace(0, x['gen'].max(), 100)
+    evenspaced = np.linspace(0, x['gen'].max(), 100)
     pdf = stats.beta.pdf(evenspaced, a, b, loc = loc, scale = scale) 
     plt.plot(evenspaced, pdf)
     plt.hist(x['gen'], normed = True)
@@ -75,7 +75,7 @@ winterhours.sort()
     plt.figure(figsize=(12,8)) 
     x = totalhourlywinter.loc[hour]
     (a,b,loc,scale)=stats.beta.fit(x['use'], loc=0, fscale = x['use'].max())
-    evenspaced = nm.linspace(0, x['use'].max(), 100)
+    evenspaced = np.linspace(0, x['use'].max(), 100)
     pdf = stats.beta.pdf(evenspaced, a, b, loc = loc, scale = scale) 
     plt.plot(evenspaced, pdf)
     plt.hist(x['use'], normed = True)
@@ -88,14 +88,14 @@ winterhours.sort()
 #    plt.figure(figsize=(12,8)) 
 #    x = totalhourlywinter.loc[hour]
 #    kde = stats.gaussian_kde(x['gen'])
-#    evenspaced = nm.linspace(0, x['gen'].max(), 100)
+#    evenspaced = np.linspace(0, x['gen'].max(), 100)
 #    pdf = kde.pdf(evenspaced)
 #    """sorted1 = x['gen'].sort_values().head(x['gen'].count() // 2)
 #    sorted2 = x['gen'].sort_values().tail(x['gen'].count() // 2)
 #    (a1, b1) = stats.norm.fit(sorted1, loc=0, fscale = x['gen'].median())
 #    (a2, b2, loc2, scale2) = stats.beta.fit(sorted2, loc = x['gen'].median() , fscale = x['gen'].max())
-#    evenspaced1 = nm.linspace(0, x['gen'].max() / 2, 100)
-#    evenspaced2 = nm.linspace(x['gen'].max() / 2, x['gen'].max(), 100)
+#    evenspaced1 = np.linspace(0, x['gen'].max() / 2, 100)
+#    evenspaced2 = np.linspace(x['gen'].max() / 2, x['gen'].max(), 100)
 #    pdf1 = stats.norm.pdf(evenspaced1, a1, b1) 
 #    pdf2 = stats.beta.pdf(evenspaced2, a2, b2, loc = loc2, scale = scale2) 
 #    plt.plot(evenspaced1, pdf1)
@@ -109,8 +109,9 @@ for hour, k in zip(summerhours, range(24)):
     plt.figure(figsize=(12,8))  
     x = totalhourlysummer.loc[hour]
     kde = stats.gaussian_kde(x['use'])
-    evenspaced = nm.linspace(0, x['use'].max(), 100)
+    evenspaced = np.linspace(0, x['use'].max(), 100)
     pdf = kde.pdf(evenspaced)  
+    plt.axvline(np.percentile(x['use'], 95), linestyle = '--', color = 'r')
     plt.plot(evenspaced, pdf)
     plt.hist(x['use'], normed = True)
     plt.xlabel('Total Use (Kilowatts)') 
