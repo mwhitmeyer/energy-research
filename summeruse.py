@@ -44,7 +44,9 @@ for hour, k in zip(summerhours, range(24)):
     plt.figure(figsize=(12,8)) 
     x = totalhourlysummer.loc[hour]
     kde = stats.gaussian_kde(x['use'], 0.25)
+#    print(kde.integrate_box_1d(0, maxUseOrGen))
     pdf = kde.pdf(evenspaced)
+    print(np.trapz(pdf, dx = maxUseOrGen/(evenspaced.size - 1)))
     toWrite[str(k) + ':00 pdf'] = pdf
     plt.axvline(np.percentile(x['use'], 95), linestyle = '--', color = 'r')
     plt.plot(evenspaced, pdf)

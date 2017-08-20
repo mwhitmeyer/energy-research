@@ -50,6 +50,7 @@ for hour, k in zip(winterhours[7:20], range(7, 20)):
     x = totalhourlywinter.loc[hour]
     kde = stats.gaussian_kde(x['gen'], 0.25)
     pdf = kde.pdf(evenspaced)
+    print(np.trapz(pdf, dx = maxUseOrGen/(evenspaced.size - 1)))
     toWrite[str(k) + ':00 pdf'] = pdf
     plt.axvline(np.percentile(x['gen'], 95), linestyle = '--', color = 'r')
     plt.plot(evenspaced, pdf)
