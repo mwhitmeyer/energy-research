@@ -40,7 +40,7 @@ winterhours.sort()
 toWrite = pd.DataFrame()
 maxUseOrGen = max(totalhourlywinter['gen'].max(), totalhourlywinter['use'].max(), 
                   totalhourlysummer['gen'].max(), totalhourlysummer['use'].max())
-evenspaced = np.linspace(0, maxUseOrGen, 100)
+evenspaced = np.arange(0, maxUseOrGen + 1, 1)
 toWrite['power'] = evenspaced
 
     
@@ -48,9 +48,8 @@ toWrite['power'] = evenspaced
 for hour, k in zip(winterhours[7:20], range(7, 20)):
     plt.figure(figsize=(12,8)) 
     x = totalhourlywinter.loc[hour]
-    kde = stats.gaussian_kde(x['gen'], 0.25)
+    kde = stats.gaussian_kde(x['gen'], 0.35)
     pdf = kde.pdf(evenspaced)
-    print(np.trapz(pdf, dx = maxUseOrGen/(evenspaced.size - 1)))
     toWrite[str(k) + ':00 pdf'] = pdf
     plt.axvline(np.percentile(x['gen'], 95), linestyle = '--', color = 'r')
     plt.plot(evenspaced, pdf)

@@ -43,7 +43,7 @@ toWrite['power'] = evenspaced
 for hour, k in zip(summerhours, range(24)):
     plt.figure(figsize=(12,8)) 
     x = totalhourlysummer.loc[hour]
-    kde = stats.gaussian_kde(x['use'], 0.25)
+    kde = stats.gaussian_kde(x['use'], .35)
 #    print(kde.integrate_box_1d(0, maxUseOrGen))
     pdf = kde.pdf(evenspaced)
     print(np.trapz(pdf, dx = maxUseOrGen/(evenspaced.size - 1)))

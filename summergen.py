@@ -42,7 +42,7 @@ toWrite['power'] = evenspaced
 for hour, k in zip(summerhours[6:21], range(6, 21)):
     plt.figure(figsize=(12,8)) 
     x = totalhourlysummer.loc[hour]
-    kde = stats.gaussian_kde(x['gen'], 0.25)
+    kde = stats.gaussian_kde(x['gen'], 0.35)
     pdf = kde.pdf(evenspaced)
     toWrite[str(k) + ':00 pdf'] = pdf
     plt.axvline(np.percentile(x['gen'], 95), linestyle = '--', color = 'r')

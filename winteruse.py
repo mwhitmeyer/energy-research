@@ -48,7 +48,7 @@ toWrite['power'] = evenspaced
 for hour, k in zip(winterhours, range(24)):
     plt.figure(figsize=(12,8)) 
     x = totalhourlywinter.loc[hour]
-    kde = stats.gaussian_kde(x['use'], 0.25)
+    kde = stats.gaussian_kde(x['use'], 0.35)
     pdf = kde.pdf(evenspaced)
     toWrite[str(k) + ':00 pdf'] = pdf
     plt.axvline(np.percentile(x['use'], 95), linestyle = '--', color = 'r')
