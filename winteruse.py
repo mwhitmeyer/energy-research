@@ -40,7 +40,7 @@ winterhours.sort()
 toWrite = pd.DataFrame()
 maxUseOrGen = max(totalhourlywinter['gen'].max(), totalhourlywinter['use'].max(), 
                   totalhourlysummer['gen'].max(), totalhourlysummer['use'].max())
-evenspaced = np.linspace(0, maxUseOrGen, 100)
+evenspaced = np.arange(0, maxUseOrGen + 1, 1)
 toWrite['power'] = evenspaced
 
     
