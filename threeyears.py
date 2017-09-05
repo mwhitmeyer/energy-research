@@ -56,33 +56,43 @@ def getWinterGen():
     hours = list(hours)
     hours.sort()
     
+    #initiate a dataframe for the actual summed gen values in the three winters for every hour
+    temp = winter2.loc['13:00:00'].index
+    temp = [x[5:] for x in temp]
+    summedvals = pd.DataFrame(index = hours, columns = temp)
+    summedvals.fillna(0, inplace = True)
+        
+    
     # initiate the dataframe that we will write to the csv
-    toWrite = pd.DataFrame()
+    pdfvals = pd.DataFrame()
     # find the max power value for our PDF and histograms
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     # for our PDF, with step size of 1
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
     # the first column of our data frame with the evenly spaced power values
-    toWrite['power'] = evenspaced
+    pdfvals['power'] = evenspaced
     
-    # plots a histogram and a pdf for the KDE, and puts the pdf value in toWrite 
+    # plots a histogram and a pdf for the KDE, and puts the pdf value in pdfvals
     for hour, k in zip(hours[7:20], range(7, 20)):
         plt.figure(figsize=(12,8)) 
         x1 = winter1.loc[hour]['gen']
         x2 = winter2.loc[hour]['gen']
         x3 = winter3.loc[hour]['gen']
+        for i in range(len(temp)):
+            summedvals[temp[i]][hour] += x1[i] + x2[i] + x3[i]
         #combine the three winters of data
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
-        toWrite[str(k) + ':00 pdf'] = pdf
+        pdfvals[str(k) + ':00 pdf'] = pdf
         plt.axvline(np.percentile(combined, 95), linestyle = '--', color = 'r')
         plt.plot(evenspaced, pdf)
         plt.hist(combined, normed = True)
         plt.ylabel('Probability Density')
         plt.title('Winter PV Generation Histogram for ' + str(k) + ':00')
     
-    toWrite.to_csv('threewintersgen.csv')
+    pdfvals.to_csv('threewintersgen.csv')
+    summedvals.T.to_csv('threewintersgensummed.csv')
     
 def getWinterLoad():
     winter1 = gbDate.loc['2013-12-01':'2014-02-28', ['use', 'gen']]
@@ -102,10 +112,10 @@ def getWinterLoad():
     hours = list(hours)
     hours.sort()
     
-    toWrite = pd.DataFrame()
+    pdfvals = pd.DataFrame()
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
-    toWrite['power'] = evenspaced
+    pdfvals['power'] = evenspaced
     
     for hour, k in zip(hours, range(24)):
         plt.figure(figsize=(12,8)) 
@@ -115,14 +125,14 @@ def getWinterLoad():
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
-        toWrite[str(k) + ':00 pdf'] = pdf
+        pdfvals[str(k) + ':00 pdf'] = pdf
         plt.axvline(np.percentile(combined, 95), linestyle = '--', color = 'r')
         plt.plot(evenspaced, pdf)
         plt.hist(combined, normed = True)
         plt.ylabel('Probability Density')
         plt.title('Winter Load Histogram for ' + str(k) + ':00')
     
-    toWrite.to_csv('threewintersuse.csv')
+    pdfvals.to_csv('threewintersuse.csv')
 
 def getAllSummerData():
     getSummerGen()
@@ -146,10 +156,10 @@ def getSummerGen():
     hours = list(hours)
     hours.sort()
     
-    toWrite = pd.DataFrame()
+    pdfvals = pd.DataFrame()
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
-    toWrite['power'] = evenspaced
+    pdfvals['power'] = evenspaced
     
     for hour, k in zip(hours[6:21], range(6, 21)):
         plt.figure(figsize=(12,8)) 
@@ -159,14 +169,14 @@ def getSummerGen():
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
-        toWrite[str(k) + ':00 pdf'] = pdf
+        pdfvals[str(k) + ':00 pdf'] = pdf
         plt.axvline(np.percentile(combined, 95), linestyle = '--', color = 'r')
         plt.plot(evenspaced, pdf)
         plt.hist(combined, normed = True)
         plt.ylabel('Probability Density')
         plt.title('Summer Generation Histogram for ' + str(k) + ':00')
     
-    toWrite.to_csv('threesummergen.csv')
+    pdfvals.to_csv('threesummergen.csv')
     
     
 def getSummerLoad():
@@ -187,10 +197,10 @@ def getSummerLoad():
     hours = list(hours)
     hours.sort()
     
-    toWrite = pd.DataFrame()
+    pdfvals = pd.DataFrame()
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
-    toWrite['power'] = evenspaced
+    pdfvals['power'] = evenspaced
     
     for hour, k in zip(hours, range(24)):
         plt.figure(figsize=(12,8)) 
@@ -200,14 +210,14 @@ def getSummerLoad():
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
-        toWrite[str(k) + ':00 pdf'] = pdf
+        pdfvals[str(k) + ':00 pdf'] = pdf
         plt.axvline(np.percentile(combined, 95), linestyle = '--', color = 'r')
         plt.plot(evenspaced, pdf)
         plt.hist(combined, normed = True)
         plt.ylabel('Probability Density')
         plt.title('Summer Load Histogram for ' + str(k) + ':00')
     
-    toWrite.to_csv('threesummeruse.csv')
+    pdfvals.to_csv('threesummeruse.csv')
 
 finaltime = current_milli_time()
 print('time taken in milliseconds: ' + str(finaltime-initialtime))
