@@ -57,13 +57,14 @@ def getWinterGen():
     hours.sort()
     
     #initiate a dataframe for the actual summed gen values in the three winters for every hour
-    temp = winter2.loc['13:00:00'].index
-    temp = [x[5:] for x in temp]
-    summedvals = pd.DataFrame(index = hours, columns = temp)
-    summedvals.fillna(0, inplace = True)
+    #temp = winter2.loc['13:00:00'].index #list of all the dates
+    #temp = [x[5:] for x in temp] #get rid of the year part of the date (2013-12-01 --> 12-01)
+    temp = winter1.index.levels[1].append(winter2.index.levels[1].append(winter3.index.levels[1]))
+    summedvals = pd.DataFrame(index = hours, columns = temp) #initiate dataframe
+    summedvals.fillna(0, inplace = True) #replace NaN with zeros
         
     
-    # initiate the dataframe that we will write to the csv
+    # initiate the dataframe for the pdf values that we will write to the csv
     pdfvals = pd.DataFrame()
     # find the max power value for our PDF and histograms
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
@@ -78,8 +79,13 @@ def getWinterGen():
         x1 = winter1.loc[hour]['gen']
         x2 = winter2.loc[hour]['gen']
         x3 = winter3.loc[hour]['gen']
-        for i in range(len(temp)):
-            summedvals[temp[i]][hour] += x1[i] + x2[i] + x3[i]
+        for date in x1.index:
+            #fill in the dataframe with the sum of each of the three winters (at corresponding date and time)
+            summedvals[date][hour] += x1[date]
+        for date in x2.index:
+            summedvals[date][hour] += x2[date]
+        for date in x3.index:
+            summedvals[date][hour] += x3[date]
         #combine the three winters of data
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
@@ -112,6 +118,12 @@ def getWinterLoad():
     hours = list(hours)
     hours.sort()
     
+#    temp = winter2.loc['13:00:00'].index
+ #   temp = [x[5:] for x in temp]
+    temp = winter1.index.levels[1].append(winter2.index.levels[1].append(winter3.index.levels[1]))
+    summedvals = pd.DataFrame(index = hours, columns = temp)
+    summedvals.fillna(0, inplace = True)
+    
     pdfvals = pd.DataFrame()
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
@@ -122,6 +134,13 @@ def getWinterLoad():
         x1 = winter1.loc[hour]['use']
         x2 = winter2.loc[hour]['use']
         x3 = winter3.loc[hour]['use']
+        for date in x1.index:
+            #fill in the dataframe with the sum of each of the three winters (at corresponding date and time)
+            summedvals[date][hour] += x1[date]
+        for date in x2.index:
+            summedvals[date][hour] += x2[date]
+        for date in x3.index:
+            summedvals[date][hour] += x3[date]
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
@@ -133,6 +152,7 @@ def getWinterLoad():
         plt.title('Winter Load Histogram for ' + str(k) + ':00')
     
     pdfvals.to_csv('threewintersuse.csv')
+    summedvals.T.to_csv('threewintersusesummed.csv')
 
 def getAllSummerData():
     getSummerGen()
@@ -156,6 +176,12 @@ def getSummerGen():
     hours = list(hours)
     hours.sort()
     
+#    temp = summer2.loc['13:00:00'].index
+#    temp = [x[5:] for x in temp]
+    temp = summer1.index.levels[1].append(summer2.index.levels[1].append(summer3.index.levels[1]))
+    summedvals = pd.DataFrame(index = hours, columns = temp)
+    summedvals.fillna(0, inplace = True)
+    
     pdfvals = pd.DataFrame()
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
@@ -166,6 +192,13 @@ def getSummerGen():
         x1 = summer1.loc[hour]['gen']
         x2 = summer2.loc[hour]['gen']
         x3 = summer3.loc[hour]['gen']
+        for date in x1.index:
+            #fill in the dataframe with the sum of each of the three winters (at corresponding date and time)
+            summedvals[date][hour] += x1[date]
+        for date in x2.index:
+            summedvals[date][hour] += x2[date]
+        for date in x3.index:
+            summedvals[date][hour] += x3[date]
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
@@ -177,6 +210,7 @@ def getSummerGen():
         plt.title('Summer Generation Histogram for ' + str(k) + ':00')
     
     pdfvals.to_csv('threesummergen.csv')
+    summedvals.T.to_csv('threesummergensummed.csv')
     
     
 def getSummerLoad():
@@ -197,6 +231,12 @@ def getSummerLoad():
     hours = list(hours)
     hours.sort()
     
+#    temp = summer2.loc['13:00:00'].index
+#    temp = [x[5:] for x in temp]
+    temp = summer1.index.levels[1].append(summer2.index.levels[1].append(summer3.index.levels[1]))
+    summedvals = pd.DataFrame(index = hours, columns = temp)
+    summedvals.fillna(0, inplace = True)
+    
     pdfvals = pd.DataFrame()
     maxUseOrGen = max(gbDate['gen'].max(), gbDate['use'].max())
     evenspaced = np.arange(0, maxUseOrGen + 1, 1)
@@ -207,6 +247,13 @@ def getSummerLoad():
         x1 = summer1.loc[hour]['use']
         x2 = summer2.loc[hour]['use']
         x3 = summer3.loc[hour]['use']
+        for date in x1.index:
+            #fill in the dataframe with the sum of each of the three winters (at corresponding date and time)
+            summedvals[date][hour] += x1[date]
+        for date in x2.index:
+            summedvals[date][hour] += x2[date]
+        for date in x3.index:
+            summedvals[date][hour] += x3[date]
         combined = x1.append(x2).append(x3)
         kde = stats.gaussian_kde(combined, 0.35)
         pdf = kde.pdf(evenspaced)
@@ -218,6 +265,7 @@ def getSummerLoad():
         plt.title('Summer Load Histogram for ' + str(k) + ':00')
     
     pdfvals.to_csv('threesummeruse.csv')
+    summedvals.T.to_csv('threesummerusesummed.csv')
 
 finaltime = current_milli_time()
 print('time taken in milliseconds: ' + str(finaltime-initialtime))
