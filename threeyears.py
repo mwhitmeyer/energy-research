@@ -17,6 +17,9 @@ initialtime = current_milli_time()
 
 threeyears = pd.read_csv('12012013-08312016thirtyhomes1.csv')
 
+threeyears.loc[threeyears['gen']<0, 'gen'] = 0
+
+
 #get rid of timezone at the end of the localminute obj ('00:00:00-05' --> '00:00:00')
 threeyears['localminute'] = [row[1][:len(row[1]) - 3] for row in threeyears.itertuples()] 
 
@@ -28,6 +31,34 @@ threeyears['date'], threeyears['time'] = threeyears['localminute'].str.split(' '
 # group by date and time, then sum. 
 # Lets us easily choose the date range, and then group by time and date
 gbDate = threeyears.groupby(['date', 'time']).sum()
+
+def adjust_gen(ideal_ratio=1):
+    
+    global gbDate
+    totaluse = threeyears['use'].sum()
+    totalgen = threeyears['gen'].sum()
+
+    curr_ratio = totalgen/totaluse
+
+    adjusted_vals = []
+
+    for x in threeyears['gen']:
+        adjusted_vals.append(x*ideal_ratio/curr_ratio)
+    
+    threeyears['gen'] = adjusted_vals
+    gbDate = threeyears.groupby(['date', 'time']).sum()
+
+del gbDate['dataid']
+
+
+def reformat():
+    result = gbDate.copy()
+    result = result.reset_index()
+    result['time'] = [int(row[2][0:2]) for row in result.itertuples()]
+    result.rename(columns={'time': 'hour', 'date': 'day'}, inplace=True)
+    return result
+
+
 
 
 def getAllWinterData():
@@ -57,8 +88,6 @@ def getWinterGen():
     hours.sort()
     
     #initiate a dataframe for the actual summed gen values in the three winters for every hour
-    #temp = winter2.loc['13:00:00'].index #list of all the dates
-    #temp = [x[5:] for x in temp] #get rid of the year part of the date (2013-12-01 --> 12-01)
     temp = winter1.index.levels[1].append(winter2.index.levels[1].append(winter3.index.levels[1]))
     summedvals = pd.DataFrame(index = hours, columns = temp) #initiate dataframe
     summedvals.fillna(0, inplace = True) #replace NaN with zeros
